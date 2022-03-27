@@ -1,9 +1,11 @@
+# goal of the script is to create a tic tac toe game
 # Author: aqeelanwar
 # Created: 12 March,2020, 7:06 PM
 # Email: aqeel.anwar@gatech.edu
 
 from tkinter import *
 import numpy as np
+import random
 
 size_of_board = 600
 symbol_size = (size_of_board / 3 - size_of_board / 8) / 2
@@ -122,6 +124,7 @@ class Tic_Tac_Toe():
         return (size_of_board / 3) * logical_position + size_of_board / 6
 
     def convert_grid_to_logical_position(self, grid_position):
+        print(grid_position)
         grid_position = np.array(grid_position)
         return np.array(grid_position // (size_of_board / 3), dtype=int)
 
@@ -180,25 +183,32 @@ class Tic_Tac_Toe():
 
         return gameover
 
-
-
-
-
     def click(self, event):
         grid_position = [event.x, event.y]
         logical_position = self.convert_grid_to_logical_position(grid_position)
 
         if not self.reset_board:
-            if self.player_X_turns:
-                if not self.is_grid_occupied(logical_position):
-                    self.draw_X(logical_position)
-                    self.board_status[logical_position[0]][logical_position[1]] = -1
+            if not self.is_grid_occupied(logical_position):
+                self.draw_X(logical_position)
+                self.board_status[logical_position[0]][logical_position[1]] = -1
+                self.player_X_turns = not self.player_X_turns
+                if self.is_there_empty_cell():
+                    logical_position_O = self.make_random_move()
+                    self.draw_O(logical_position_O)
+                    self.board_status[logical_position_O[0]][logical_position_O[1]] = 1
                     self.player_X_turns = not self.player_X_turns
-            else:
-                if not self.is_grid_occupied(logical_position):
-                    self.draw_O(logical_position)
-                    self.board_status[logical_position[0]][logical_position[1]] = 1
-                    self.player_X_turns = not self.player_X_turns
+
+        # if not self.reset_board:
+        #     if self.player_X_turns:
+        #         if not self.is_grid_occupied(logical_position):
+        #             self.draw_X(logical_position)
+        #             self.board_status[logical_position[0]][logical_position[1]] = -1
+        #             self.player_X_turns = not self.player_X_turns
+        #     else:
+        #         if not self.is_grid_occupied(logical_position):
+        #             self.draw_O(logical_position)
+        #             self.board_status[logical_position[0]][logical_position[1]] = 1
+        #             self.player_X_turns = not self.player_X_turns
 
             # Check if game is concluded
             if self.is_gameover():
@@ -208,6 +218,27 @@ class Tic_Tac_Toe():
             self.canvas.delete("all")
             self.play_again()
             self.reset_board = False
+
+
+
+    def is_there_empty_cell(self): 
+        for i in range(1,int(size_of_board)-10,int(size_of_board)// 3):
+            for j in range(1,int(size_of_board)-10,int(size_of_board)// 3):
+                grid_position = [i,j]
+                logical_position = self.convert_grid_to_logical_position(grid_position)
+                if not self.is_grid_occupied(logical_position): 
+                    return True
+        return False
+    def make_random_move(self):
+        """
+        Returns a random currently empty logical position
+        """
+        is_square_empty = False
+        while not is_square_empty:
+            grid_position = [random.randrange(size_of_board), random.randrange(size_of_board)]
+            logical_position = self.convert_grid_to_logical_position(grid_position)
+            is_square_empty = not self.is_grid_occupied(logical_position)
+        return logical_position
 
 
 game_instance = Tic_Tac_Toe()
